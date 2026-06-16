@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Application — Built, Not Written</title>
+<meta name="description" content="An interactive job application for an AI-native Executive Assistant role, built with Claude Code.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-page:#f8f7f4;--bg-primary:#ffffff;--bg-secondary:#f3f2ee;--bg-tertiary:#eae9e4;
+  --text-primary:#1a1a1a;--text-secondary:#6b6b6b;--text-tertiary:#9a9a9a;
+  --border:#e0dfdb;--border-light:#ebebeb;
+  --accent:#534AB7;--accent-light:#EEEDFE;--accent-mid:#AFA9EC;--accent-text:#26215C;
+  --danger-bg:#fef2f2;--danger-text:#991b1b;
+  --warning-bg:#fffbeb;--warning-text:#92400e;
+  --info-bg:#eff6ff;--info-text:#1e40af;
+  --success-bg:#f0fdf4;--success-text:#166534;
+  --teal:#5DCAA5;--teal-dark:#04342C;--teal-light:#E1F5EE;
+  --radius:8px;--radius-lg:12px;
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg-page:#0f0f0f;--bg-primary:#1a1a1a;--bg-secondary:#222222;--bg-tertiary:#2a2a2a;
+  --text-primary:#e8e8e8;--text-secondary:#999999;--text-tertiary:#666666;
+  --border:#333333;--border-light:#2a2a2a;
+  --accent:#7F77DD;--accent-light:#2a2650;--accent-mid:#534AB7;--accent-text:#d4d0f8;
+  --danger-bg:#3b1111;--danger-text:#fca5a5;
+  --warning-bg:#3b2506;--warning-text:#fcd34d;
+  --info-bg:#0c1f3d;--info-text:#93c5fd;
+  --success-bg:#0a2615;--success-text:#86efac;
+  --teal:#1D9E75;--teal-dark:#9FE1CB;--teal-light:#085041;
+}}
+body{
+  font-family:var(--font);background:var(--bg-page);color:var(--text-primary);
+  line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:720px;margin:0 auto;padding:2rem 1.5rem 4rem}
+@media(max-width:600px){.wrap{padding:1.5rem 1rem 3rem}}
+
+.hero{padding:3rem 0 2rem;border-bottom:1px solid var(--border-light);margin-bottom:2rem}
+.badge{
+  display:inline-block;font-size:12px;font-weight:500;color:var(--accent);
+  background:var(--accent-light);padding:5px 14px;border-radius:20px;margin-bottom:16px;
+  letter-spacing:0.02em;
+}
+.hero h1{font-size:28px;font-weight:600;margin:0 0 10px;line-height:1.3}
+@media(max-width:600px){.hero h1{font-size:22px}}
+.hero p{font-size:15px;color:var(--text-secondary);margin:0;line-height:1.7;max-width:560px}
+
+.nb{
+  display:flex;gap:2px;border-bottom:1px solid var(--border-light);margin-bottom:2rem;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+.nb button{
+  background:none;border:none;padding:12px 16px;font-size:13px;font-weight:400;
+  color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;
+  font-family:var(--font);white-space:nowrap;transition:color 0.15s;
+}
+.nb button:hover{color:var(--text-primary)}
+.nb button.on{color:var(--text-primary);border-bottom-color:var(--accent);font-weight:500}
+.nb button i{font-size:14px;vertical-align:-1px;margin-right:5px}
+
+.sec{display:none;animation:fadeIn 0.25s ease-out}
+.sec.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.q-label{font-size:15px;color:var(--text-secondary);margin:0 0 1.25rem;line-height:1.6}
+.q-label strong{color:var(--text-primary);font-weight:500}
+
+.tg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+@media(max-width:500px){.tg{grid-template-columns:1fr}}
+.tc{
+  background:var(--bg-secondary);border-radius:var(--radius);padding:16px;
+  transition:transform 0.15s,box-shadow 0.15s;
+}
+.tc:hover{transform:translateY(-2px)}
+.tc i.tool-icon{font-size:22px;color:var(--accent);margin-bottom:8px;display:block}
+.tc h3{font-size:14px;font-weight:500;margin:0 0 4px}
+.tc p{font-size:12.5px;color:var(--text-secondary);margin:0;line-height:1.5}
+
+.step{display:flex;gap:14px;margin-bottom:1.25rem}
+.step:last-child{margin-bottom:0}
+.step-num{
+  width:28px;height:28px;border-radius:50%;background:var(--accent-light);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0;
+  margin-top:1px;
+}
+.step h3{font-size:14px;font-weight:500;margin:0 0 3px}
+.step p{font-size:13px;color:var(--text-secondary);margin:0;line-height:1.55}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:1.75rem}
+.metric{background:var(--bg-secondary);border-radius:var(--radius);padding:14px 16px}
+.metric .label{font-size:12px;color:var(--text-secondary);margin:0}
+.metric .label i{font-size:14px;vertical-align:-2px;margin-right:4px}
+.metric .value{font-size:24px;font-weight:500;margin:4px 0 0}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.pop{animation:pop 0.3s ease-out both}
+
+.section-label{font-size:13px;font-weight:500;margin:0 0 10px;display:flex;align-items:center;gap:6px}
+.section-label i{font-size:16px;vertical-align:-1px}
+.section-label span{font-weight:400;color:var(--text-secondary)}
+
+.ix{
+  display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:var(--radius);
+  border:1px solid var(--border-light);margin-bottom:8px;transition:background 0.15s;
+}
+.ix:hover{background:var(--bg-secondary)}
+.ix .from{font-size:13px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ix .subj{font-size:12px;color:var(--text-secondary);flex:2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:500px){.ix .subj{display:none}}
+.pri{
+  font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;flex-shrink:0;
+  cursor:pointer;transition:transform 0.1s;user-select:none;
+}
+.pri:active{transform:scale(0.93)}
+.tg-u{background:var(--danger-bg);color:var(--danger-text)}
+.tg-a{background:var(--warning-bg);color:var(--warning-text)}
+.tg-f{background:var(--info-bg);color:var(--info-text)}
+.tg-d{background:var(--success-bg);color:var(--success-text)}
+
+.ship{
+  background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);
+  padding:16px 20px;margin-bottom:12px;
+}
+.ship:last-child{margin-bottom:0}
+.ship-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ship-route{font-size:14px;font-weight:500}
+.ship-route i{font-size:12px;margin:0 5px;color:var(--text-tertiary)}
+.ship-status{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500}
+.ship-bar{background:var(--bg-tertiary);border-radius:4px;height:5px;margin-bottom:8px;overflow:hidden}
+.ship-bar div{height:100%;border-radius:4px;transition:width 1.2s ease-out}
+.ship-detail{font-size:12px;color:var(--text-secondary);margin:0}
+
+.tz-card{
+  background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);
+  padding:20px 24px;margin-bottom:1.75rem;
+}
+.tz-fields{display:flex;gap:2rem;flex-wrap:wrap}
+.tz-field .lbl{font-size:12px;color:var(--text-secondary);margin:0 0 4px}
+.tz-field .lbl i{font-size:14px;vertical-align:-2px;margin-right:4px}
+.tz-field .val{font-size:15px;font-weight:500;margin:0}
+
+.tz-vis{margin-bottom:8px}
+.tz-vis .tz-label{font-size:11px;color:var(--text-secondary);margin-bottom:3px}
+.tz-bar{display:flex;height:26px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border-light)}
+.tz-hours{
+  display:flex;justify-content:space-between;font-size:10px;color:var(--text-tertiary);
+  margin-bottom:5px;padding:0 2px;
+}
+.tz-legend{display:flex;gap:16px;font-size:12px;color:var(--text-secondary);margin-top:10px;flex-wrap:wrap}
+.tz-legend span{display:flex;align-items:center;gap:5px}
+.tz-legend .dot{width:10px;height:10px;border-radius:3px}
+
+.avail-box{margin-top:1.75rem;padding:16px;background:var(--bg-secondary);border-radius:var(--radius)}
+.avail-box p{font-size:13px;margin:0;line-height:1.65;color:var(--text-secondary)}
+
+.footer{
+  text-align:center;padding:2.5rem 0 0;margin-top:2rem;
+  border-top:1px solid var(--border-light);
+}
+.footer p{font-size:12px;color:var(--text-tertiary);margin:0}
+.footer a{color:var(--accent);text-decoration:none}
+.footer a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="badge">Job application</div>
+  <h1>This application was built, not written</h1>
+  <p>I used Claude Code to create this interactive application — because the best answer to "are you AI-native?" is to demonstrate it. Every section below was designed, coded, and shipped in a single session.</p>
+</header>
+
+<nav class="nb" id="nav" role="tablist">
+  <button class="on" data-t="ai" role="tab" aria-selected="true"><i class="ti ti-robot" aria-hidden="true"></i>AI toolkit</button>
+  <button data-t="learn" role="tab" aria-selected="false"><i class="ti ti-bulb" aria-hidden="true"></i>How I learn</button>
+  <button data-t="demo" role="tab" aria-selected="false"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Dashboard demo</button>
+  <button data-t="tz" role="tab" aria-selected="false"><i class="ti ti-clock" aria-hidden="true"></i>Timezone</button>
+</nav>
+
+<!-- AI TOOLKIT -->
+<section class="sec active" id="sec-ai" role="tabpanel">
+  <p class="q-label"><strong>Question 1:</strong> Which AI/LLM tools do you use regularly and what for?</p>
+  <div class="tg">
+    <div class="tc">
+      <i class="ti ti-message-chatbot tool-icon" aria-hidden="true"></i>
+      <h3>Claude / ChatGPT</h3>
+      <p>Drafting in someone's voice, data analysis, research, reasoning through ambiguous problems</p>
+    </div>
+    <div class="tc">
+      <i class="ti ti-code tool-icon" aria-hidden="true"></i>
+      <h3>Claude Code / Cursor</h3>
+      <p>Building internal tools, dashboards, and automations — this application is the proof</p>
+    </div>
+    <div class="tc">
+      <i class="ti ti-arrows-shuffle tool-icon" aria-hidden="true"></i>
+      <h3>Make / Zapier</h3>
+      <p>Multi-step automations — inbox triage, CRM sync, notification routing, data pipelines</p>
+    </div>
+    <div class="tc">
+      <i class="ti ti-file-text tool-icon" aria-hidden="true"></i>
+      <h3>Notion AI</h3>
+      <p>SOP libraries, meeting notes, project wikis with AI-assisted search and summarization</p>
+    </div>
+    <div class="tc">
+      <i class="ti ti-table tool-icon" aria-hidden="true"></i>
+      <h3>Sheets + AI formulas</h3>
+      <p>Financial models, inventory tracking, multi-entity reconciliation with generated formulas</p>
+    </div>
+    <div class="tc">
+      <i class="ti ti-mail-fast tool-icon" aria-hidden="true"></i>
+      <h3>AI email drafting</h3>
+      <p>Voice-matched replies, priority classification, follow-up tracking, thread summarization</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW I LEARN -->
+<section class="sec" id="sec-learn" role="tabpanel">
+  <p class="q-label"><strong>Question 2:</strong> Teaching yourself something unfamiliar and building a working process</p>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div>
+      <h3>Identified the gap</h3>
+      <p>[Your example — e.g., "Needed to manage cross-border customs paperwork for imports from three countries, with zero prior logistics experience."]</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div>
+      <h3>Researched independently</h3>
+      <p>[Your approach — e.g., "Used Claude to break down HS tariff codes, mapped required documents per country, cross-referenced with customs broker contacts."]</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div>
+      <h3>Built the process</h3>
+      <p>[What you created — e.g., "Built a Notion SOP with per-country checklists, automated document collection reminders via Make, created a status tracking sheet."]</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div>
+      <h3>Automated the repeatable parts</h3>
+      <p>[The result — e.g., "Reduced 4 hours per shipment to 30 minutes. Process runs autonomously with exception alerts only."]</p>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD DEMO -->
+<section class="sec" id="sec-demo" role="tabpanel">
+  <p class="q-label"><strong>Live prototype:</strong> A taste of the operational dashboard I'd build for you. Click email tags to re-triage.</p>
+
+  <div class="metrics">
+    <div class="metric">
+      <p class="label"><i class="ti ti-mail" aria-hidden="true"></i>Inbox triaged</p>
+      <p class="value" id="m-inbox">47</p>
+    </div>
+    <div class="metric">
+      <p class="label"><i class="ti ti-checkbox" aria-hidden="true"></i>Tasks done</p>
+      <p class="value">12</p>
+    </div>
+    <div class="metric">
+      <p class="label"><i class="ti ti-ship" aria-hidden="true"></i>In transit</p>
+      <p class="value">3</p>
+    </div>
+    <div class="metric">
+      <p class="label"><i class="ti ti-file-check" aria-hidden="true"></i>SOPs built</p>
+      <p class="value">8</p>
+    </div>
+  </div>
+
+  <p class="section-label"><i class="ti ti-inbox" aria-hidden="true"></i>Inbox triage <span>(click tags to re-classify)</span></p>
+  <div id="inbox">
+    <div class="ix">
+      <span class="from">Supplier (CN)</span>
+      <span class="subj">Shipment delay — new ETA needed</span>
+      <span class="pri tg-u">Urgent</span>
+    </div>
+    <div class="ix">
+      <span class="from">Accountant</span>
+      <span class="subj">Q2 BAS lodgement — review needed</span>
+      <span class="pri tg-a">Action</span>
+    </div>
+    <div class="ix">
+      <span class="from">3PL partner</span>
+      <span class="subj">Updated rate card for AU warehousing</span>
+      <span class="pri tg-f">FYI</span>
+    </div>
+    <div class="ix">
+      <span class="from">Marketing</span>
+      <span class="subj">Product photography brief — approval</span>
+      <span class="pri tg-d">Delegate</span>
+    </div>
+    <div class="ix">
+      <span class="from">Customs broker</span>
+      <span class="subj">MEL container cleared — pickup ready</span>
+      <span class="pri tg-a">Action</span>
+    </div>
+  </div>
+
+  <p class="section-label" style="margin-top:1.75rem"><i class="ti ti-ship" aria-hidden="true"></i>Shipment tracker</p>
+  <div class="ship">
+    <div class="ship-head">
+      <span class="ship-route">Shenzhen <i class="ti ti-arrow-right" aria-hidden="true"></i> Sydney</span>
+      <span class="ship-status" style="background:var(--warning-bg);color:var(--warning-text)">In transit</span>
+    </div>
+    <div class="ship-bar"><div id="prog1" style="background:var(--accent);width:0"></div></div>
+    <p class="ship-detail">MSKU8234510 — ETA Jun 28 — 420 units</p>
+  </div>
+  <div class="ship">
+    <div class="ship-head">
+      <span class="ship-route">Istanbul <i class="ti ti-arrow-right" aria-hidden="true"></i> Melbourne</span>
+      <span class="ship-status" style="background:var(--success-bg);color:var(--success-text)">Customs</span>
+    </div>
+    <div class="ship-bar"><div id="prog2" style="background:var(--teal);width:0"></div></div>
+    <p class="ship-detail">TCLU9157230 — customs clearance in progress — 280 units</p>
+  </div>
+  <div class="ship">
+    <div class="ship-head">
+      <span class="ship-route">Ho Chi Minh <i class="ti ti-arrow-right" aria-hidden="true"></i> Perth</span>
+      <span class="ship-status" style="background:var(--info-bg);color:var(--info-text)">Booked</span>
+    </div>
+    <div class="ship-bar"><div id="prog3" style="background:#378ADD;width:0"></div></div>
+    <p class="ship-detail">CMAU4429871 — departs Jul 3 — 150 units</p>
+  </div>
+</section>
+
+<!-- TIMEZONE -->
+<section class="sec" id="sec-tz" role="tabpanel">
+  <p class="q-label"><strong>Question 3:</strong> Location and overlap with Sydney (AEST) hours</p>
+
+  <div class="tz-card">
+    <div class="tz-fields">
+      <div class="tz-field">
+        <p class="lbl"><i class="ti ti-map-pin" aria-hidden="true"></i>Location</p>
+        <p class="val">[Your city]</p>
+      </div>
+      <div class="tz-field">
+        <p class="lbl"><i class="ti ti-clock" aria-hidden="true"></i>Timezone</p>
+        <p class="val">[GMT+X]</p>
+      </div>
+      <div class="tz-field">
+        <p class="lbl"><i class="ti ti-calendar-check" aria-hidden="true"></i>AEST overlap</p>
+        <p class="val">[X hrs daily]</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="section-label">Daily schedule overlap with Sydney (AEST)</p>
+  <div class="tz-hours">
+    <span>12am</span><span>3am</span><span>6am</span><span>9am</span><span>12pm</span><span>3pm</span><span>6pm</span><span>9pm</span><span>12am</span>
+  </div>
+  <div class="tz-vis">
+    <div class="tz-label">Sydney (AEST)</div>
+    <div class="tz-bar">
+      <div style="flex:6;background:var(--bg-secondary)"></div>
+      <div style="flex:1;background:var(--accent-light)"></div>
+      <div style="flex:9;background:var(--accent-mid);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--accent-text)">9am — 6pm AEST</div>
+      <div style="flex:1;background:var(--accent-light)"></div>
+      <div style="flex:7;background:var(--bg-secondary)"></div>
+    </div>
+  </div>
+  <div class="tz-vis" style="margin-top:6px">
+    <div class="tz-label">Your hours</div>
+    <div class="tz-bar">
+      <div style="flex:6;background:var(--bg-secondary)"></div>
+      <div style="flex:1;background:var(--teal-light)"></div>
+      <div style="flex:9;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--teal-dark)">[Your working hours]</div>
+      <div style="flex:1;background:var(--teal-light)"></div>
+      <div style="flex:7;background:var(--bg-secondary)"></div>
+    </div>
+  </div>
+  <div class="tz-legend">
+    <span><span class="dot" style="background:var(--accent-mid)"></span>Sydney core</span>
+    <span><span class="dot" style="background:var(--teal)"></span>Your core</span>
+    <span><span class="dot" style="background:var(--accent-light)"></span>Flexible</span>
+  </div>
+
+  <div class="avail-box">
+    <p>[Write your availability statement — e.g., "Available 8am-6pm AEST daily with flexibility for urgent matters. Experienced working async with distributed teams across AU/EU/US timezones."]</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Built in a single session with <a href="https://claude.ai/code" target="_blank" rel="noopener">Claude Code</a></p>
+</footer>
+
+</div>
+
+<script>
+(function(){
+  var tabs = {ai:'sec-ai', learn:'sec-learn', demo:'sec-demo', tz:'sec-tz'};
+  var btns = document.querySelectorAll('#nav button');
+
+  function show(t) {
+    Object.keys(tabs).forEach(function(key) {
+      var el = document.getElementById(tabs[key]);
+      var btn = document.querySelector('[data-t="'+key+'"]');
+      if (key === t) {
+        el.classList.add('active');
+        btn.classList.add('on');
+        btn.setAttribute('aria-selected','true');
+      } else {
+        el.classList.remove('active');
+        btn.classList.remove('on');
+        btn.setAttribute('aria-selected','false');
+      }
+    });
+  }
+
+  btns.forEach(function(b) {
+    b.addEventListener('click', function() { show(b.dataset.t); });
+  });
+
+  // Inbox triage interaction
+  var pris = ['tg-u','tg-a','tg-f','tg-d'];
+  var labels = ['Urgent','Action','FYI','Delegate'];
+  var counter = 47;
+
+  document.querySelectorAll('.pri').forEach(function(tag) {
+    tag.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var cur = pris.findIndex(function(c) { return tag.classList.contains(c); });
+      tag.classList.remove(pris[cur]);
+      var next = (cur + 1) % 4;
+      tag.classList.add(pris[next]);
+      tag.textContent = labels[next];
+      counter++;
+      var el = document.getElementById('m-inbox');
+      el.textContent = counter;
+      el.classList.remove('pop');
+      void el.offsetWidth;
+      el.classList.add('pop');
+    });
+  });
+
+  // Animate progress bars on load
+  setTimeout(function() {
+    document.getElementById('prog1').style.width = '65%';
+    document.getElementById('prog2').style.width = '90%';
+    document.getElementById('prog3').style.width = '15%';
+  }, 300);
+})();
+</script>
+</body>
+</html>
